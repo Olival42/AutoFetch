@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/${NAME_DB}
+    username: ${USER_DB}
+    password: ${PASSWORD_DB}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  redis:
+    host: ${REDIS_HOST}
+    port: ${PORT_REDIS}
+
+server:
+  port: ${API_PORT}

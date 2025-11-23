@@ -1,0 +1,66 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${USER_DB}
+      POSTGRES_PASSWORD: ${PASSWORD_DB}
+      POSTGRES_DB: ${NAME_DB}
+    ports:
+      - "${PORT_DB}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_DB} -d ${NAME_DB} -h localhost -p 5432 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - spring-net
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "${PORT_REDIS}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - spring-net
+
+  api:
+    build: .
+    container_name: spring-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    environment:
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+      API_PORT: ${API_PORT}
+      PORT_DB: ${PORT_DB}
+      PORT_REDIS: ${PORT_REDIS}
+      USER_DB: ${USER_DB}
+      PASSWORD_DB: ${PASSWORD_DB}
+      NAME_DB: ${NAME_DB}
+      HOST_DB: ${HOST_DB}
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://${HOST_DB}:${PORT_DB}/${NAME_DB}"
+      SPRING_DATASOURCE_USERNAME: ${USER_DB}
+      SPRING_DATASOURCE_PASSWORD: ${PASSWORD_DB}
+      REDIS_HOST: ${REDIS_HOST}
+    networks:
+      - spring-net
+
+networks:
+  spring-net:
+
+volumes:
+  postgres_data:

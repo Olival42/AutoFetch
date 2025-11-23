@@ -1,0 +1,30 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "explorer.compactFolders": true,
+    "explorer.sortOrder": "foldersNestsFiles",
+    "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+    },
+    "material-icon-theme.folders.associations": {
+      "domain": "class",              
+      "application": "controller",    
+      "adapters": "components",       
+      "config": "config",             
+      "controller": "controller",
+      "repository": "repository",
+      "infrastructure": "server",
+      "persistence": "database",
+      "entity": "class",
+      "dto": "interface",
+      "mapper": "pipe",
+      "openapi": "docs",
+      "swagger": "docs",
+      "kafka": "queue",
+      "test": "test",
+      "utils": "tools",
+      "common": "tools",
+      "logging": "logs",
+      "log": "logs"
+  },
+  "spring-boot.ls.validation.enabled": false,
+}

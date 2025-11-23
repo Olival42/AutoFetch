@@ -1,0 +1,70 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+.env
+
+# --- Recomendações adicionais ---
+# OS / Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Logs / temp
+*.log
+hs_err_pid*
+*.tmp
+*~
+*.swp
+
+# Java / build artifacts
+*.class
+*.jar
+app.jar
+.cache/
+
+# Maven extras
+.mvn/wrapper/maven-wrapper.properties
+dependency-reduced-pom.xml
+release.properties
+
+# Docker / env
+docker-compose.override.yml
+docker-compose.*.yml
+.env.local
+.env.*
+
+# Redis / DB dumps
+dump.rdb
+*.rdb
