@@ -1,6 +1,8 @@
 package com.example.autofetch.modules.User.domain.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,8 +25,8 @@ import lombok.Setter;
 public class User {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @Column(nullable = false, unique = true)
     private String userName;
@@ -35,7 +37,23 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    private LocalDateTime createAt;
+    /* private String downloadCount;
 
-    private LocalDateTime updateAt;
+    @Column(nullable = true)
+    private String googleAccessToken;
+
+    @Column(nullable = true)
+    private String googleRefreshToken; */
+
+    private Instant createAt;
+
+    public void encoderPassword(String password) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        this.password = encoder.encode(password);
+    }
+
+    public boolean matchPassword(String rawPassword) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.matches(rawPassword, this.password);
+    }
 }

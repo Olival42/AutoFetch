@@ -18,3 +18,7 @@ spring:
 
 server:
   port: ${API_PORT}
+
+jwt:
+  private.key: classpath:keys/private.pem
+  public.key: classpath:keys/public.pem

@@ -1,3 +1,43 @@
+package com.example.autofetch.modules.User.application.web.controller;
+
+import java.net.URI;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import com.example.autofetch.modules.User.application.web.dto.UserRegisterRequestDTO;
+import com.example.autofetch.modules.User.application.web.dto.UserResponseDTO;
+import com.example.autofetch.modules.User.domain.service.UserService;
+import com.example.autofetch.shared.ApiResponse;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/auth")
 public class UserController {
-    
+
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegisterRequestDTO userRegisterRequestDTO, UriComponentsBuilder uri) {
+        
+        UserResponseDTO userResponseDTO = userService.registerUser(userRegisterRequestDTO);
+        
+        URI url = uri.path("/users/{id}").buildAndExpand(userResponseDTO.getId()).toUri();
+
+        ApiResponse<?> response = ApiResponse.builder()
+            .success(true)
+            .data(userResponseDTO)
+            .error(null)
+            .build();
+
+        return ResponseEntity.created(url).body(response);
+    }
+
 }

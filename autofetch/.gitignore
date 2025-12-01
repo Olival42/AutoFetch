@@ -68,3 +68,5 @@ docker-compose.*.yml
 # Redis / DB dumps
 dump.rdb
 *.rdb
+
+*.pem
