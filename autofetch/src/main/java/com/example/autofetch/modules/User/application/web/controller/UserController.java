@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.example.autofetch.modules.User.application.web.dto.UserLoginRequestDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserRegisterRequestDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserResponseDTO;
 import com.example.autofetch.modules.User.domain.service.UserService;
@@ -25,7 +26,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegisterRequestDTO userRegisterRequestDTO, UriComponentsBuilder uri) {
+    public ResponseEntity<ApiResponse<?>> registerUser(@RequestBody @Valid UserRegisterRequestDTO userRegisterRequestDTO, UriComponentsBuilder uri) {
         
         UserResponseDTO userResponseDTO = userService.registerUser(userRegisterRequestDTO);
         
@@ -38,6 +39,20 @@ public class UserController {
             .build();
 
         return ResponseEntity.created(url).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<?>> loginUser(@RequestBody @Valid UserLoginRequestDTO userLoginRequestDTO, UriComponentsBuilder uri) {
+        
+        UserResponseDTO userResponseDTO = userService.loginUser(userLoginRequestDTO);
+        
+        ApiResponse<?> response = ApiResponse.builder()
+            .success(true)
+            .data(userResponseDTO)
+            .error(null)
+            .build();
+
+        return ResponseEntity.ok(response);
     }
 
 }
