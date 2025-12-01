@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 public class UserRegisterRequestDTO {
 
     @Length(min = 5, max = 100, message = "Username must be between 5 and 100 characters")
-    @NotBlank(message="Username cannot be null")
-    private String userName;
+    @NotBlank(message="Name of user cannot be null")
+    private String name;
 
     @NotBlank(message="Email cannot be null")
     @Email(message="Invalid email format")

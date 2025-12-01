@@ -1,6 +1,9 @@
 package com.example.autofetch.modules.User.domain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -8,6 +11,7 @@ import com.example.autofetch.modules.User.adapters.mapper.UserMapper;
 import com.example.autofetch.modules.User.application.web.dto.UserLoginRequestDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserRegisterRequestDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserResponseDTO;
+import com.example.autofetch.modules.User.domain.entity.User;
 import com.example.autofetch.modules.User.domain.repository.IUserRepository;
 import com.example.autofetch.modules.User.infrastructure.security.service.JWTService;
 
@@ -22,6 +26,9 @@ public class UserService {
     
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Transactional
     public UserResponseDTO registerUser(UserRegisterRequestDTO userRegisterRequestDTO) {
@@ -47,13 +54,12 @@ public class UserService {
     @Transactional
     public UserResponseDTO loginUser(UserLoginRequestDTO userLoginRequestDTO) {
         
-        var userEntity = userRepository.findByEmail(userLoginRequestDTO.getEmail())
-            .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+        var usernamePassword = new UsernamePasswordAuthenticationToken(userLoginRequestDTO.getEmail(), userLoginRequestDTO.getPassword());
 
-        if(!userEntity.matchPassword(userLoginRequestDTO.getPassword())) {
-            throw new IllegalArgumentException("Invalid email or password");
-        }
+        Authentication auth = this.authenticationManager.authenticate(usernamePassword);
 
+        var userEntity = (User) auth.getPrincipal();
+        
         String accessToken = jwtService.generateAcessToken(userEntity.getEmail());
         String refreshToken = jwtService.generateRefreshToken(userEntity.getEmail());
         
