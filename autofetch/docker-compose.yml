@@ -55,7 +55,8 @@ services:
       SPRING_DATASOURCE_URL: "jdbc:postgresql://${HOST_DB}:${PORT_DB}/${NAME_DB}"
       SPRING_DATASOURCE_USERNAME: ${USER_DB}
       SPRING_DATASOURCE_PASSWORD: ${PASSWORD_DB}
-      REDIS_HOST: ${REDIS_HOST}
+      SPRING_DATA_REDIS_HOST: ${REDIS_HOST}
+      SPRING_DATA_REDIS_PORT: ${PORT_REDIS}
     networks:
       - spring-net
 

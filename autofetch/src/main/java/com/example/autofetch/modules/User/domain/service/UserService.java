@@ -1,5 +1,7 @@
 package com.example.autofetch.modules.User.domain.service;
 
+import java.time.Instant;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +16,7 @@ import com.example.autofetch.modules.User.application.web.dto.UserResponseDTO;
 import com.example.autofetch.modules.User.domain.entity.User;
 import com.example.autofetch.modules.User.domain.repository.IUserRepository;
 import com.example.autofetch.modules.User.infrastructure.security.service.JWTService;
+import com.example.autofetch.modules.User.infrastructure.security.service.TokenBlacklistService;
 
 @Service
 public class UserService {
@@ -29,6 +32,9 @@ public class UserService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private TokenBlacklistService blacklistService;
 
     @Transactional
     public UserResponseDTO registerUser(UserRegisterRequestDTO userRegisterRequestDTO) {
@@ -69,5 +75,25 @@ public class UserService {
         userResponseDTO.setExpiresAt(jwtService.getExpirationEpochSeconds(accessToken));
 
         return userResponseDTO; 
+    }
+
+    @Transactional
+    public void logoutUser(String acessToken, String refreshToken) {
+
+        long expAcessToken = jwtService.getExpirationEpochSeconds(acessToken);
+        long expRefreshToken = jwtService.getExpirationEpochSeconds(refreshToken);
+
+        long now = Instant.now().getEpochSecond();
+
+        long ttlAcessToken = expAcessToken - now;
+        long ttlRefreshToken = expRefreshToken - now;
+
+        if (ttlAcessToken > 0) {
+            blacklistService.blacklistToken(acessToken, ttlAcessToken);
+        }
+        
+        if (ttlRefreshToken > 0) {
+            blacklistService.blacklistToken(refreshToken, ttlRefreshToken);
+        }
     }
 }

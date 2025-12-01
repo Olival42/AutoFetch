@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -109,6 +110,21 @@ public class GlobalExceptionHandler {
         public DataErrors(FieldError error) {
             this(error.getField(), error.getDefaultMessage());
         }
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableException er) {
+        ErrorResponse error = ErrorResponse.builder()
+            .error("MISSING_BODY")
+            .message("Request body is required")
+            .build();
+
+        ApiResponse<?> response = ApiResponse.builder()
+                .success(false)
+                .data(null)
+                .error(error)
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(Exception.class)

@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.autofetch.modules.User.application.web.dto.UserLoginRequestDTO;
+import com.example.autofetch.modules.User.application.web.dto.UserRefreshTokenRequestDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserRegisterRequestDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserResponseDTO;
 import com.example.autofetch.modules.User.domain.service.UserService;
@@ -55,4 +57,19 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<?>> logoutUser(@RequestHeader("Authorization") String header, @RequestBody @Valid UserRefreshTokenRequestDTO userRefreshTokenRequestDTO) {
+        
+        String tokenAcessToken = header.substring(7);
+        userService.logoutUser(tokenAcessToken, userRefreshTokenRequestDTO.getRefreshToken());
+
+        ApiResponse<?> response = ApiResponse.builder()
+            .success(true)
+            .data("Logged out successfully")
+            .error(null)
+            .build();
+
+        return ResponseEntity.ok(response);
+    }
 }

@@ -3,6 +3,7 @@ package com.example.autofetch.modules.User.infrastructure.security.config;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,10 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.example.autofetch.modules.User.infrastructure.security.infrastructure.TokenBlacklistFilter;
+import com.example.autofetch.shared.security.CustomAuthEntryPoint;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -36,17 +40,22 @@ public class SecurityConfig {
     @Value("${jwt.private.key}")
     private RSAPrivateKey priv;
 
+    @Autowired
+    private TokenBlacklistFilter tokenBlacklistFilter;
+
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, CustomAuthEntryPoint entryPoint) throws Exception {
         http.csrf(csrf -> csrf.disable())
+            .addFilterBefore(tokenBlacklistFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(
                 auth -> auth
-                    .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers("/auth/login", "/auth/register", "/auth/logout").permitAll()
                     .anyRequest().authenticated())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .oauth2ResourceServer(
                 conf -> conf.jwt(
-                    jwt -> jwt.decoder(jwtDecoder())));
+                    jwt -> jwt.decoder(jwtDecoder())
+                ).authenticationEntryPoint(entryPoint));
         return http.build();
     }
 
