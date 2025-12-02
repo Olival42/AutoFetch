@@ -63,7 +63,7 @@ release.properties
 docker-compose.override.yml
 docker-compose.*.yml
 .env.local
-.env.*
+.env
 
 # Redis / DB dumps
 dump.rdb
