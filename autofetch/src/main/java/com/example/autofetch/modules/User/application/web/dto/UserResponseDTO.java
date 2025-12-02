@@ -13,7 +13,4 @@ public class UserResponseDTO {
 	private String id;
 	private String name;
 	private String email;
-	private String accessToken;
-    private Long expiresAt;
-	private String refreshToken;
 }

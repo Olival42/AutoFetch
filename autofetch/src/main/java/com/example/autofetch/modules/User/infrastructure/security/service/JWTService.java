@@ -53,6 +53,16 @@ public class JWTService {
             .getTokenValue();
     }
 
+    public String getSubject(String token) {
+        Jwt jwt = jwtDecoder.decode(token);
+        return jwt.getSubject();
+    }
+
+    public String getTokenType(String token) {
+        Jwt jwt = jwtDecoder.decode(token);
+        return jwt.getClaimAsString("type");
+    }
+
     public long getExpirationEpochSeconds(String token) {
         Jwt jwt = jwtDecoder.decode(token);
 

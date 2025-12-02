@@ -22,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.autofetch.modules.User.infrastructure.security.infrastructure.TokenBlacklistFilter;
+import com.example.autofetch.modules.User.infrastructure.security.infrastructure.TokenConsistencyFilter;
 import com.example.autofetch.shared.security.CustomAuthEntryPoint;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -43,13 +44,17 @@ public class SecurityConfig {
     @Autowired
     private TokenBlacklistFilter tokenBlacklistFilter;
 
+    @Autowired
+    private TokenConsistencyFilter tokenConsistencyFilter;
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, CustomAuthEntryPoint entryPoint) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .addFilterBefore(tokenBlacklistFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(tokenConsistencyFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(
                 auth -> auth
-                    .requestMatchers("/auth/login", "/auth/register", "/auth/logout").permitAll()
+                    .requestMatchers("/auth/login", "/auth/register").permitAll()
                     .anyRequest().authenticated())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .oauth2ResourceServer(

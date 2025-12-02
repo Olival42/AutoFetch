@@ -1,15 +1,17 @@
 package com.example.autofetch.modules.User.application.web.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserRefreshTokenRequestDTO {
+@Builder
+public class UserAuthTokenDTO {
 
-    @NotBlank(message="Refresh token is required")
-    private String refreshToken;
+    private String accessToken;
+    private Long expiresAt;
+	private String refreshToken;
 }
