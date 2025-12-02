@@ -3,7 +3,6 @@ package com.example.autofetch.modules.User.infrastructure.security.config;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,20 +40,15 @@ public class SecurityConfig {
     @Value("${jwt.private.key}")
     private RSAPrivateKey priv;
 
-    @Autowired
-    private TokenBlacklistFilter tokenBlacklistFilter;
-
-    @Autowired
-    private TokenConsistencyFilter tokenConsistencyFilter;
-
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http, CustomAuthEntryPoint entryPoint) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, CustomAuthEntryPoint entryPoint,
+            TokenBlacklistFilter tokenBlacklistFilter, TokenConsistencyFilter tokenConsistencyFilter) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .addFilterBefore(tokenBlacklistFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(tokenConsistencyFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(
                 auth -> auth
-                    .requestMatchers("/auth/login", "/auth/register").permitAll()
+                    .requestMatchers("/auth/login", "/auth/register", "/auth/refresh").permitAll()
                     .anyRequest().authenticated())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .oauth2ResourceServer(

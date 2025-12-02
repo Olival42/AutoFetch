@@ -21,7 +21,7 @@ public class JWTService {
 
     public String generateAcessToken(String email) {
         Instant now = Instant.now();
-        long expiry = 36000L;
+        long expiry = 60L * 60L;
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuer("autofetch-api")
@@ -38,7 +38,7 @@ public class JWTService {
 
     public String generateRefreshToken(String email) {
         Instant now = Instant.now();
-        long expiry = 60L * 60L * 24L;
+        long expiry = 60L * 60L * 24L * 7L;
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuer("autofetch-api")

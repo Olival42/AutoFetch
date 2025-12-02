@@ -109,7 +109,7 @@ public class UserService {
             throw new TokenExpiredException("Refresh token is expired.");
         }
 
-        String email = jwtService.getEmailFromToken(refreshToken);
+        String email = jwtService.getSubject(refreshToken);
 
         long ttl = jwtService.getExpirationEpochSeconds(refreshToken) - Instant.now().getEpochSecond();
         if (ttl > 0) {
