@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import com.example.autofetch.modules.User.infrastructure.security.config.JwtProperties;
+
 @Service
 public class JWTService {
 
@@ -19,9 +21,12 @@ public class JWTService {
     @Autowired
     private JwtDecoder jwtDecoder;
 
+    @Autowired
+    private JwtProperties jwtProperties;
+
     public String generateAcessToken(String email) {
         Instant now = Instant.now();
-        long expiry = 60L * 60L;
+        long expiry = now.plus(jwtProperties.getAccessTokenExpiration()).getEpochSecond() - now.getEpochSecond();
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuer("autofetch-api")
@@ -38,7 +43,7 @@ public class JWTService {
 
     public String generateRefreshToken(String email) {
         Instant now = Instant.now();
-        long expiry = 60L * 60L * 24L * 7L;
+        long expiry = now.plus(jwtProperties.getRefreshTokenExpiration()).getEpochSecond() - now.getEpochSecond();
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuer("autofetch-api")

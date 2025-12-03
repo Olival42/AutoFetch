@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/${NAME_DB}
+    url: jdbc:postgresql://${HOST_DB}:${PORT_DB}/${NAME_DB}
     username: ${USER_DB}
     password: ${PASSWORD_DB}
     driver-class-name: org.postgresql.Driver
@@ -22,3 +22,5 @@ server:
 jwt:
   private.key: classpath:keys/private.pem
   public.key: classpath:keys/public.pem
+  access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
+  refresh-token-expiration: ${REFRESH_TOKEN_EXPIRATION}
