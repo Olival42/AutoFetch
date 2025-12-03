@@ -24,3 +24,15 @@ jwt:
   public.key: classpath:keys/public.pem
   access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
   refresh-token-expiration: ${REFRESH_TOKEN_EXPIRATION}
+
+  mail:
+      host: smtp.gmail.com
+      port: ${PORT_SMTP}
+      username: ${MAIL_USERNAME}
+      password: ${MAIL_PASSWORD}
+      properties:
+        mail:
+          smtp:
+            auth: true
+            starttls:
+              enable: true
