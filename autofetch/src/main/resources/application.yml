@@ -5,6 +5,18 @@ spring:
     password: ${PASSWORD_DB}
     driver-class-name: org.postgresql.Driver
 
+  mail:
+      host: smtp.gmail.com
+      port: ${PORT_SMTP}
+      username: ${MAIL_USERNAME}
+      password: ${MAIL_PASSWORD}
+      properties:
+        mail:
+          smtp:
+            auth: true
+            starttls:
+              enable: true
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -24,15 +36,3 @@ jwt:
   public.key: classpath:keys/public.pem
   access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
   refresh-token-expiration: ${REFRESH_TOKEN_EXPIRATION}
-
-  mail:
-      host: smtp.gmail.com
-      port: ${PORT_SMTP}
-      username: ${MAIL_USERNAME}
-      password: ${MAIL_PASSWORD}
-      properties:
-        mail:
-          smtp:
-            auth: true
-            starttls:
-              enable: true

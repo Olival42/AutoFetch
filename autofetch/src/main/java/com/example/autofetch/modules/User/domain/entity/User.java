@@ -41,9 +41,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    /* private String downloadCount;
-
-    @Column(nullable = true)
+    /* @Column(nullable = true)
     private String googleAccessToken;
 
     @Column(nullable = true)

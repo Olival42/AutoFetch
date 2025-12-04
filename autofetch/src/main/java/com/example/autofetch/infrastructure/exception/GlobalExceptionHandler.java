@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -198,6 +199,7 @@ public class GlobalExceptionHandler {
                                 .error("MISSING_TOKEN")
                                 .message(ex.getMessage())
                                 .build();
+
                 ApiResponse<?> response = ApiResponse.builder()
                                 .success(false)
                                 .data(null)
@@ -206,11 +208,11 @@ public class GlobalExceptionHandler {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
-        @ExceptionHandler(RuntimeException.class)
-        public ResponseEntity<ApiResponse<?>> handleRuntimeException(RuntimeException er) {
+        @ExceptionHandler(BadCredentialsException.class)
+        public ResponseEntity<ApiResponse<?>> handleBadCredentials(BadCredentialsException ex) {
                 ErrorResponse error = ErrorResponse.builder()
-                                .error("RUNTIME_EXCEPTION")
-                                .message(er.getMessage())
+                                .error("BAD_CREDENTIALS")
+                                .message(ex.getMessage())
                                 .build();
 
                 ApiResponse<?> response = ApiResponse.builder()
@@ -218,7 +220,7 @@ public class GlobalExceptionHandler {
                                 .data(null)
                                 .error(error)
                                 .build();
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
         @ExceptionHandler(Exception.class)

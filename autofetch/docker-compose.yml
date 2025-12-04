@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${PASSWORD_DB}
       POSTGRES_DB: ${NAME_DB}
     ports:
-      - "${PORT_DB}:5432"
+      - "${PORT_DB}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -23,7 +23,7 @@ services:
     image: redis:latest
     container_name: redis
     ports:
-      - "${PORT_REDIS}:6379"
+      - "${PORT_REDIS}"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -44,7 +44,7 @@ services:
     ports:
       - "${API_PORT}:${API_PORT}"
     environment:
-      JAVA_OPTS: "-Xms256m -Xmx512m"
+      JAVA_OPTS: ${JAVA_OPTS}
       API_PORT: ${API_PORT}
       PORT_DB: ${PORT_DB}
       PORT_REDIS: ${PORT_REDIS}

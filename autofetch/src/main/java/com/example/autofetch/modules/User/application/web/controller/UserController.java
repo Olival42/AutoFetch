@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.autofetch.modules.User.application.web.dto.UserAuthTokenDTO;
+import com.example.autofetch.modules.User.application.web.dto.UserForgotPasswordRequestDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserLoginRequestDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserRegisterRequestDTO;
+import com.example.autofetch.modules.User.application.web.dto.UserResetPasswordRequestDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserResponseDTO;
 import com.example.autofetch.modules.User.domain.service.UserService;
 import com.example.autofetch.modules.User.infrastructure.security.service.JWTService;
@@ -152,4 +154,31 @@ public class UserController {
 
                 return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
         }
+
+        @PostMapping("/forgot-password")
+        public ResponseEntity<ApiResponse<?>> forgotPassword(
+                        @RequestBody @Valid UserForgotPasswordRequestDTO userForgotPasswordRequestDTO) {
+                userService.forgotPassword(userForgotPasswordRequestDTO.getEmail());
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(true)
+                                .data("Password reset instructions have been sent to your email.")
+                                .build();
+
+                return ResponseEntity.ok().body(response);
+        }
+
+        @PostMapping("/reset-password")
+        public ResponseEntity<ApiResponse<?>> resetPassword(
+                        @RequestBody @Valid UserResetPasswordRequestDTO requestBody) {
+                userService.resetPassword(requestBody.getToken(), requestBody.getNewPassword());
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(true)
+                                .data("Password has been reset successfully.")
+                                .build();
+
+                return ResponseEntity.ok().body(response);
+        }
+
 }

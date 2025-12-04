@@ -1,11 +1,14 @@
 package com.example.autofetch.modules.User.domain.service;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,16 +21,22 @@ import com.example.autofetch.modules.User.application.web.dto.UserAuthTokenDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserLoginRequestDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserRegisterRequestDTO;
 import com.example.autofetch.modules.User.application.web.dto.UserResponseDTO;
+import com.example.autofetch.modules.User.domain.entity.ResetPasswordToken;
 import com.example.autofetch.modules.User.domain.entity.User;
+import com.example.autofetch.modules.User.domain.repository.IResetPasswordTokenRepository;
 import com.example.autofetch.modules.User.domain.repository.IUserRepository;
 import com.example.autofetch.modules.User.infrastructure.security.service.JWTService;
 import com.example.autofetch.modules.User.infrastructure.security.service.TokenBlacklistService;
+import com.example.autofetch.shared.email.service.EmailService;
 
 @Service
 public class UserService {
 
     @Autowired
     private IUserRepository userRepository;
+
+    @Autowired
+    private IResetPasswordTokenRepository resetPasswordTokenRepository;
 
     @Autowired
     private JWTService jwtService;
@@ -40,6 +49,12 @@ public class UserService {
 
     @Autowired
     private TokenBlacklistService blacklistService;
+
+    @Autowired
+    private EmailService mailService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserResponseDTO registerUser(UserRegisterRequestDTO userRegisterRequestDTO) {
@@ -119,7 +134,6 @@ public class UserService {
         return generateTokens(email);
     }
 
-    @Transactional
     public UserAuthTokenDTO generateTokens(String email) {
 
         String accessToken = jwtService.generateAcessToken(email);
@@ -131,5 +145,47 @@ public class UserService {
                 .refreshToken(refreshToken)
                 .expiresAt(expiresAt)
                 .build();
+    }
+
+    @Transactional
+    public void forgotPassword(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+
+            resetPasswordTokenRepository.deleteByEmail(user.getEmail());
+
+            String token = UUID.randomUUID().toString();
+
+            String hashedToken = passwordEncoder.encode(token);
+
+            ResetPasswordToken resetToken = new ResetPasswordToken();
+            resetToken.setToken(hashedToken);
+            resetToken.setEmail(user.getEmail());
+            resetToken.setExpiresAt(Instant.now().plus(Duration.ofMinutes(15)));
+
+            resetPasswordTokenRepository.save(resetToken);
+
+            String resetLink = "https://yourdomain.com/reset-password?token=" + token;
+
+            mailService.sendResetPasswordEmail(user.getEmail(), resetLink);
+        });
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        ResetPasswordToken resetToken = resetPasswordTokenRepository.findValidToken(Instant.now())
+                .stream()
+                .filter(rt -> passwordEncoder.matches(token, rt.getToken()))
+                .findFirst()
+                .orElseThrow(() -> new InvalidTokenTypeException("Invalid reset password token."));
+
+        if (resetToken.getExpiresAt().isBefore(Instant.now())) {
+            throw new TokenExpiredException("Reset password token is expired.");
+        }
+
+        User user = userRepository.findByEmail(resetToken.getEmail()).orElseThrow();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        resetPasswordTokenRepository.delete(resetToken);
     }
 }

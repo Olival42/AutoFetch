@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.example.autofetch.modules.User.infrastructure.security.infrastructure.RateLimitFilter;
 import com.example.autofetch.modules.User.infrastructure.security.infrastructure.TokenBlacklistFilter;
 import com.example.autofetch.modules.User.infrastructure.security.infrastructure.TokenConsistencyFilter;
 import com.example.autofetch.shared.security.CustomAuthEntryPoint;
@@ -42,13 +43,14 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, CustomAuthEntryPoint entryPoint,
-            TokenBlacklistFilter tokenBlacklistFilter, TokenConsistencyFilter tokenConsistencyFilter) throws Exception {
+            TokenBlacklistFilter tokenBlacklistFilter, TokenConsistencyFilter tokenConsistencyFilter, RateLimitFilter rateLimitFilter) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .addFilterBefore(tokenBlacklistFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(tokenConsistencyFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(
                 auth -> auth
-                    .requestMatchers("/auth/login", "/auth/register", "/auth/refresh").permitAll()
+                    .requestMatchers("/auth/login", "/auth/register", "/auth/refresh", "/auth/forgot-password", "/auth/reset-password").permitAll()
                     .anyRequest().authenticated())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .oauth2ResourceServer(
