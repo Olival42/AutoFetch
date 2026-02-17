@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import com.example.autofetch.infrastructure.exception.security.InvalidTokenTypeException;
 import com.example.autofetch.infrastructure.exception.security.MissingTokenException;
 import com.example.autofetch.infrastructure.exception.security.TokenExpiredException;
 import com.example.autofetch.infrastructure.exception.security.TokenRevokedException;
@@ -73,7 +74,7 @@ public class GlobalExceptionHandler {
         }
 
         @ExceptionHandler(IllegalArgumentException.class)
-        public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException er) {
+        public ResponseEntity<ApiResponse<?>> handleIllegalArgument(IllegalArgumentException er) {
                 ErrorResponse error = ErrorResponse.builder()
                                 .error("ILLEGAL_ARGUMENT")
                                 .message(er.getMessage())
@@ -212,6 +213,21 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ApiResponse<?>> handleBadCredentials(BadCredentialsException ex) {
                 ErrorResponse error = ErrorResponse.builder()
                                 .error("BAD_CREDENTIALS")
+                                .message(ex.getMessage())
+                                .build();
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(false)
+                                .data(null)
+                                .error(error)
+                                .build();
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        @ExceptionHandler(InvalidTokenTypeException.class)
+        public ResponseEntity<ApiResponse<?>> handleInvalidTokenType(InvalidTokenTypeException ex) {
+                ErrorResponse error = ErrorResponse.builder()
+                                .error("INVALID_TOKEN_TYPE")
                                 .message(ex.getMessage())
                                 .build();
 

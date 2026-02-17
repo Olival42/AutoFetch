@@ -70,3 +70,5 @@ dump.rdb
 *.rdb
 
 *.pem
+
+*.json

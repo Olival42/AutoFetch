@@ -1,6 +1,9 @@
 package com.example.autofetch.shared.email.service;
 
+import java.util.concurrent.Executor;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -20,6 +23,10 @@ public class EmailService {
     @Autowired
     private SpringTemplateEngine templateEngine;
 
+    @Autowired
+    @Qualifier("taskExecutor")
+    private Executor taskExecutor;
+
     @Async
     public void sendResetPasswordEmail(String to, String resetLink) {
 
@@ -28,7 +35,7 @@ public class EmailService {
 
         String html = templateEngine.process("email/reset-password.html", context);
 
-        sendHtmlEmail(to, "Password Reset Request", html);
+        taskExecutor.execute(() -> sendHtmlEmail(to, "Password Reset Request", html));
     }
 
     private void sendHtmlEmail(String to, String subject, String html) {
